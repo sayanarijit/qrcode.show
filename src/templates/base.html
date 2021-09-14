@@ -209,6 +209,9 @@
         $('#submit').on('click', function (event) {
           event.preventDefault();
 
+          console.clear();
+          $('#qr').html('');
+
           let data = $('#data').val();
 
           $.ajax({
@@ -220,12 +223,7 @@
             },
             data: data,
             success: function (resp) {
-              console.clear();
               console.log(resp);
-            },
-
-            error: function () {
-              console.clear();
             },
           });
 
@@ -239,9 +237,6 @@
             data: data,
             success: function (resp) {
               $('#qr').html(resp);
-            },
-            error: function () {
-              $('#qr').html('');
             },
             dataType: 'html',
           });
