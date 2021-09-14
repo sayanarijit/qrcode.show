@@ -50,6 +50,7 @@ TODO:
     * Control height, width, color and other properties using parameters
     * Get a logo
     * Support dynamic QR codes
+    * Generate premium/branded QR codes
 
 SPONSORS:
 
