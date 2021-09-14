@@ -144,6 +144,11 @@
         line-height: 1.5;
       }
 
+      video {
+        max-width: 100%;
+        height: auto;
+      }
+
       #qr {
         text-align: center;
       }
@@ -191,6 +196,10 @@
         <textarea id="data" required="required"></textarea>
         <button id="submit">Generate</button>
       </div>
+
+      <video controls>
+        <source src="/__res__/demo.mp4" type="video/mp4" />
+      </video>
 
       <div class="help">
         <h3>❯ curl qrcode.show</h3>
