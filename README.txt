@@ -44,7 +44,6 @@ FEATURES:
 
 TODO:
     
-    * Decide on a license
     * Use HTTPS
     * Download JPEG, PNG support
     * Control height, width, color and other properties using parameters
