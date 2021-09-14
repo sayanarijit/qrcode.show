@@ -24,7 +24,7 @@ INPUT EXAMPLES:
 
 PARAMETERS:
 
-    Accept          Define the output type
+    Accept          Specify the output type
                     Options:
                         text/plain
                         image/svg+xml
@@ -35,14 +35,14 @@ PARAMETER EXAMPLES:
 
     $ curl qrcode.show/INPUT -H "Accept: image/svg+xml"
 
-FEATURES
+FEATURES:
     
     * No data collection or retention
     * Fast and simple API that works both on web and terminal
     * Supports GET and POST requests
     * Supports `Accept` header to control the output format
 
-TODO
+TODO:
     
     * Decide on a license
     * Use HTTPS
@@ -51,18 +51,18 @@ TODO
     * Get a logo
     * Support dynamic QR codes
 
-SPONSORS
+SPONSORS:
 
     Top 5 sponsors get mentioned here
 
-CREDITS
+CREDITS:
 
     Main Library                https://github.com/kennytm/qrcode-rust
     Web Server                  https://github.com/tokio-rs/axum
 
     Please contact the project maintainer to if you are missing from the list
 
-RELATED LINKS
+RELATED LINKS:
 
     Alternate Domain            http://qrqr.show
 
@@ -72,6 +72,6 @@ RELATED LINKS
     Donate & Support            https://ko-fi.com/sayanarijit
                                 https://liberapay.com/sayanarijit
 
-COPYRIGHT
+COPYRIGHT:
 
     © Arijit Basu 2021
