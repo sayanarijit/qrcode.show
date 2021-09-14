@@ -38,7 +38,7 @@ PARAMETER EXAMPLES:
 FEATURES:
     
     * No data collection or retention
-    * Fast and simple API that works both on web and terminal
+    * Fast and simple API that works on both web and terminal
     * Supports GET and POST requests
     * Supports `Accept` header to control the output format
 

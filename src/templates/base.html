@@ -39,10 +39,7 @@
       property="og:title"
       content="Generate QR code easily for free - QR Code Generation as a Service"
     />
-    <meta
-      property="og:url"
-      content="http://qrcode.show"
-    />
+    <meta property="og:url" content="http://qrcode.show" />
     <meta
       property="og:description"
       content="Generate QR code easily for free - QR Code Generation as a Service"
@@ -140,7 +137,7 @@
       @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
       body {
-        max-width: 640px;
+        max-width: 840px;
         margin: auto;
         font-family: 'Share Tech Mono', monospace;
         font-size: x-large;
@@ -163,6 +160,22 @@
       .help {
         text-align: left;
       }
+
+      #data {
+        min-width: 100%;
+        max-width: 100%;
+        padding: 5px;
+        -moz-box-sizing: border-box;
+        -ms-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+      }
+
+      #submit {
+        min-width: 100%;
+        max-width: 100%;
+        margin: 0;
+      }
     </style>
   </head>
   <body>
@@ -174,10 +187,65 @@
         Generate QR code easily for free - QR Code Generation as a Service
       </p>
 
+      <div class="form">
+        <textarea id="data" required="required"></textarea>
+        <button id="submit">Generate</button>
+      </div>
+
       <div class="help">
-        <h3>How to Use</h3>
+        <h3>> curl qrcode.show</h3>
         <pre>{{ help }}</pre>
       </div>
     </div>
+
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+
+    <script>
+      $(document).ready(function () {
+        $('#submit').on('click', function (event) {
+          event.preventDefault();
+
+          let data = $('#data').val();
+
+          $.ajax({
+            type: 'POST',
+            url: '/',
+            headers: {
+              'Content-Type': 'text/plain;charset=UTF-8',
+              Accept: 'text/plain',
+            },
+            data: data,
+            success: function (resp) {
+              console.log(resp);
+            },
+
+            error: function () {
+              console.clear();
+            },
+          });
+
+          $.ajax({
+            type: 'POST',
+            url: '/',
+            headers: {
+              'Content-Type': 'text/plain;charset=UTF-8',
+              Accept: 'image/svg+xml',
+            },
+            data: data,
+            success: function (resp) {
+              $('#qr').html(resp);
+            },
+            error: function () {
+              $('#qr').html('');
+            },
+            dataType: 'html',
+          });
+        });
+      });
+    </script>
   </body>
 </html>

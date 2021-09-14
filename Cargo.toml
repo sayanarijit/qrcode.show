@@ -10,7 +10,6 @@ publish = false
 axum = "0.2.4"
 hyper = { version = "0.14.12", features = ["full"] }
 qrcode = { version = "0.12.0", default-features = false, features = ["svg"] }
-serde = { version = "1.0.130", features = ["derive"] }
 tokio = { version = "1.11.0", features = ["full"] }
 tower-http = { version = "0.1.1", features = ["fs", "trace"] }
 tracing = "0.1.27"
