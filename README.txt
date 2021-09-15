@@ -14,13 +14,13 @@ INPUT:
 
 INPUT EXAMPLES:
 
-    $ curl qrcode.show/http://example.com
+    $ curl qrcode.show/https://example.com
 
-    $ curl qrcode.show -d http://example.com
+    $ curl qrcode.show -d https://example.com
 
     $ curl qrcode.show -d @/path/to/input.txt
 
-    $ echo http://example.com | curl qrcode.show -d @-
+    $ echo https://example.com | curl qrcode.show -d @-
 
 PARAMETERS:
 
@@ -65,7 +65,7 @@ CREDITS:
 
 RELATED LINKS:
 
-    Alternate Domain            http://qrqr.show
+    Alternate Domain            https://qrqr.show
 
     Project Repository          https://github.com/sayanarijit/qrcode.show
     Project Maintainer          https://arijitbasu.in
