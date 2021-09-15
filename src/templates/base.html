@@ -136,17 +136,51 @@
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
-      body {
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+
+        #printarea,
+        #printarea * {
+          visibility: visible;
+        }
+
+        #printarea #qrcontrols * {
+          visibility: hidden;
+        }
+
+        #printarea {
+          position: absolute;
+          left: 0;
+          top: 0;
+        }
+      }
+
+      body,
+      video,
+      button {
         max-width: 840px;
         margin: auto;
         font-family: 'Share Tech Mono', monospace;
         font-size: x-large;
         line-height: 1.5;
+        height: auto;
+      }
+
+      body {
+        padding: 5px;
       }
 
       video {
         max-width: 100%;
-        height: auto;
+      }
+
+      #qrcontrols,
+      #qrcontrols button {
+        text-align: center;
+        font-size: normal;
+        line-height: 1;
       }
 
       #qr {
@@ -164,6 +198,7 @@
 
       .help {
         text-align: left;
+        overflow: auto;
       }
 
       #data {
@@ -181,16 +216,24 @@
         max-width: 100%;
         margin: 0;
       }
+
+      #printarea #qrcontrols {
+        display: none;
+      }
     </style>
   </head>
   <body>
     <div id="content">
-      <div id="qr">{{ content }}</div>
+      <div id="printarea">
+        <div id="qr">{{ content }}</div>
 
-      <p class="title"><b>QR</b>code.<b>show</b></p>
-      <p class="description">
-        Generate QR code easily for free - QR Code Generation as a Service
-      </p>
+        <div id="qrcontrols"><button id="print">Print</button></div>
+
+        <p class="title"><b>QR</b>code.<b>show</b></p>
+        <p class="description">
+          Generate QR code easily for free - QR Code Generation as a Service
+        </p>
+      </div>
 
       <div class="form">
         <textarea id="data" required="required"></textarea>
@@ -219,6 +262,10 @@
 
     <script>
       $(document).ready(function () {
+        $('#print').on('click', function (event) {
+          window.print();
+        });
+
         $('#submit').on('click', function (event) {
           event.preventDefault();
 
@@ -226,6 +273,7 @@
           $('#qr').html(
             '<img src="https://via.placeholder.com/200/fff/000/?text=Loading..." height="200" width="200" />'
           );
+          $('#qrcontrols').hide();
 
           let data = $('#data').val();
 
@@ -255,6 +303,7 @@
             data: data,
             success: function (resp) {
               $('#qr').html(resp);
+              $('#qrcontrols').show();
             },
             error: function () {
               $('#qr').html(
