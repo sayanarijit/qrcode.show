@@ -197,10 +197,10 @@
         <button id="submit">Generate</button>
       </div>
 
-      <br/>
+      <br />
 
       <div class="demo">
-        <video controls>
+        <video controls autoplay>
           <source src="/__res__/demo.mp4" type="video/mp4" />
         </video>
       </div>
@@ -223,7 +223,9 @@
           event.preventDefault();
 
           console.clear();
-          $('#qr').html('');
+          $('#qr').html(
+            '<img src="https://via.placeholder.com/200/fff/000/?text=Loading..." height="200" width="200" />'
+          );
 
           let data = $('#data').val();
 
@@ -238,6 +240,9 @@
             success: function (resp) {
               console.log(resp);
             },
+            error: function () {
+              console.error('ERROR! Try again...');
+            },
           });
 
           $.ajax({
@@ -250,6 +255,11 @@
             data: data,
             success: function (resp) {
               $('#qr').html(resp);
+            },
+            error: function () {
+              $('#qr').html(
+                '<img src="https://via.placeholder.com/200/fff/f00/?text=ERROR! Try again..." height="200" width="200" />'
+              );
             },
             dataType: 'html',
           });
