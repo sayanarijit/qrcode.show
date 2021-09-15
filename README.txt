@@ -40,7 +40,7 @@ SHELL FUNCTIONS:
     Shell functions that can be added to `.bashrc` or `.bash_profle` for
     quickly generating QR codes from the command line. The command takes a
     filename or reads from stdin if none was supplied and outputs the QR code
-    to stdout: `qrcode INPUT` or `echo INPUT | qrcode`
+    to stdout: `qrcode /PATH/TO/INPUT` or `echo INPUT | qrcode`
 
         qrcode () {
           local file=${1:-/dev/stdin}
