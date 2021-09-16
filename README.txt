@@ -105,6 +105,7 @@ CREDITS:
 
     Main Library                https://github.com/kennytm/qrcode-rust
     Web Server                  https://github.com/tokio-rs/axum
+    Alternate Worker            https://github.com/cloudflare/workers-rs
 
     *Only the direct dependencies for the main business logic are listed here
     Please contact the project maintainer if you are missing from the list
