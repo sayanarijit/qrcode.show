@@ -24,12 +24,42 @@ INPUT EXAMPLES:
 
 PARAMETERS:
 
-    Accept          Specify the output type
-                    Options:
-                        text/plain
-                        image/svg+xml
-                        text/html
-                    Default: text/plain
+    Accept                      Specify the output type
+                                Options:
+                                    text/plain
+                                    image/svg+xml
+                                    text/html
+                                Default: text/plain
+
+    X-QR-Min-Width              Specify the minimum width
+
+    X-QR-Min-Height             Specify the minimun height
+
+    X-QR-Dark-Color             Specify the dark color (hex)
+                                Format: rrggbb
+
+    X-QR-Light-Color            Specify the light color (hex)
+                                Format: rrggbb
+
+    X-QR-Version-Type           Specify the QR version type
+                                Options:
+                                    normal
+                                    micro
+                                Default: auto detect
+
+    X-QR-Version-Number         Specify the QR version number
+                                Options:
+                                    1..40 for normal
+                                    1..4 for micro
+                                Default: auto detect
+
+    X-QR-EC-Level               Specify the error checking level
+                                Options:
+                                    L
+                                    M
+                                    Q
+                                    H
+                                Default: L
 
 PARAMETER EXAMPLES:
 
@@ -62,7 +92,7 @@ FEATURES:
 TODO:
     
     * Download JPEG, PNG support
-    * Control height, width, color and other properties using parameters
+    * Support more parameters
     * Get a logo
     * Support dynamic QR codes
     * Generate premium/branded QR codes
