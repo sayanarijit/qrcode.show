@@ -1,0 +1,8 @@
+{
+  "buildpacks": [
+    {
+      "url": "https://github.com/emk/heroku-buildpack-rust.git"
+    }
+  ]
+}
+

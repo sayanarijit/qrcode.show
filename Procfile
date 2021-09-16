@@ -1,1 +1,1 @@
-web: ./target/release/qrcode-show
+web: ./target/release/server

@@ -1,49 +1,25 @@
 use axum::{
     async_trait, body::Bytes, body::Full, extract::FromRequest,
     extract::OriginalUri, extract::RawBody, extract::RequestParts,
-    handler::get, http::header, http::header::HeaderValue, http::Response,
-    http::StatusCode, response::IntoResponse, service, Router,
+    handler::get, http::header, http::header::HeaderName,
+    http::header::HeaderValue, http::Response, http::StatusCode,
+    response::IntoResponse, service, Router,
 };
-use qrcode::render::svg;
-use qrcode::render::unicode;
-use qrcode::QrCode;
+use lazy_static::lazy_static;
 use std::convert::Infallible;
 use std::env;
 use std::net::SocketAddr;
 use tower_http::{services::ServeDir, trace::TraceLayer};
 
-const HELP: &str = include_str!("../README.txt");
-const TEMPLATE: &str = include_str!("./templates/base.html");
+use qrcode_show::EcLevel;
+use qrcode_show::Format;
+use qrcode_show::Generator;
 
-fn txt_to_html(txt: &str) -> String {
-    let mut result = String::new();
-    for word in txt.split(' ') {
-        if word.starts_with("http://")
-            || word.starts_with("https://")
-            || word.starts_with("qrcode.show")
-            || word.starts_with("qrqr.show")
-        {
-            let link = word.split_whitespace().next().unwrap_or_default();
-            if link.starts_with("http://") || link.starts_with("https://") {
-                result.push_str(&format!(
-                    r#"<a href="{link}">{link}</a>"#,
-                    link = link
-                ));
-            } else {
-                result.push_str(&format!(
-                    r#"<a href="//{link}">{link}</a>"#,
-                    link = link
-                ));
-            };
-            result.push_str(&word.replacen(link, "", 1));
-        } else {
-            result.push_str(word);
-        }
+const TEMPLATE: &str = include_str!("../templates/base.html");
+const HELP: &str = include_str!("../../README.txt");
 
-        result.push(' ');
-    }
-
-    result
+lazy_static! {
+    static ref HTML_HELP: String = txt_to_html(HELP);
 }
 
 #[tokio::main]
@@ -115,32 +91,22 @@ async fn main() {
         .unwrap();
 }
 
-fn get_header<B>(
+fn get_first_header_value<B>(
     req: &RequestParts<B>,
     key: header::HeaderName,
-) -> Option<Vec<String>> {
+) -> Option<String> {
     req.headers()
         .and_then(|h| h.get(key))
         .and_then(|v| v.to_str().ok())
-        .map(|s| {
-            s.split(',')
-                .map(|part| {
-                    if let Some((_, first)) = part.split_once(';') {
-                        first
-                    } else {
-                        part
-                    }
-                })
-                .map(str::trim)
-                .map(String::from)
-                .collect()
-        })
+        .and_then(|s| s.split(',').next())
+        .and_then(|s| s.split(';').next())
+        .map(String::from)
 }
 
-struct Accept(Option<Vec<String>>);
+struct QRGenerator(Generator);
 
 #[async_trait]
-impl<B> FromRequest<B> for Accept
+impl<B> FromRequest<B> for QRGenerator
 where
     B: Send, // required by `async_trait`
 {
@@ -149,7 +115,78 @@ where
     async fn from_request(
         req: &mut RequestParts<B>,
     ) -> Result<Self, Self::Rejection> {
-        Ok(Self(get_header(req, header::ACCEPT)))
+        let mut gen = Generator::default();
+
+        if let Some(val) = get_first_header_value(&req, header::ACCEPT) {
+            gen.format = Format::from(&val);
+        }
+
+        if let Some(val) = get_first_header_value(
+            &req,
+            HeaderName::from_static("x-qr-min-width"),
+        ) {
+            println!("{:?}", &val);
+            gen.min_width = val
+                .parse()
+                .map(Some)
+                .or_else(|_| Err(StatusCode::BAD_REQUEST))?;
+        }
+
+        if let Some(val) = get_first_header_value(
+            &req,
+            HeaderName::from_static("x-qr-min-height"),
+        ) {
+            gen.min_height = val
+                .parse()
+                .map(Some)
+                .or_else(|_| Err(StatusCode::BAD_REQUEST))?;
+        }
+
+        if let Some(val) = get_first_header_value(
+            &req,
+            HeaderName::from_static("x-qr-dark-color"),
+        ) {
+            gen.dark_color = Some(format!("#{}", val));
+        }
+
+        if let Some(val) = get_first_header_value(
+            &req,
+            HeaderName::from_static("x-qr-light-color"),
+        ) {
+            gen.light_color = Some(format!("#{}", val));
+        }
+
+        if let Some(val) = get_first_header_value(
+            &req,
+            HeaderName::from_static("x-qr-version-type"),
+        ) {
+            gen.version_type = val.as_str().into();
+        }
+
+        if let Some(val) = get_first_header_value(
+            &req,
+            HeaderName::from_static("x-qr-version-number"),
+        ) {
+            gen.version_number = val
+                .parse()
+                .map(Some)
+                .or_else(|_| Err(StatusCode::BAD_REQUEST))?;
+        }
+
+        if let Some(val) = get_first_header_value(
+            &req,
+            HeaderName::from_static("x-qr-ec-level"),
+        ) {
+            gen.error_correction_level = match val.as_str() {
+                "L" => Ok(Some(EcLevel::L)),
+                "M" => Ok(Some(EcLevel::M)),
+                "Q" => Ok(Some(EcLevel::Q)),
+                "H" => Ok(Some(EcLevel::H)),
+                _ => Err(StatusCode::BAD_REQUEST),
+            }?;
+        }
+
+        Ok(QRGenerator(gen))
     }
 }
 
@@ -209,7 +246,7 @@ impl IntoResponse for QRResponse {
 
 async fn post_handler(
     OriginalUri(uri): OriginalUri,
-    Accept(accept): Accept,
+    QRGenerator(gen): QRGenerator,
     RawBody(body): RawBody,
 ) -> Result<QRResponse, StatusCode> {
     let (_, path) = uri.path().split_once('/').unwrap_or_default();
@@ -225,80 +262,40 @@ async fn post_handler(
         return Err(StatusCode::BAD_REQUEST);
     }
 
-    let accept = accept
-        .and_then(|a| {
-            a.into_iter()
-                .find(|a| a == "image/svg+xml" || a == "text/html")
-                .map(String::from)
-        })
-        .map(|s| s.to_lowercase())
-        .unwrap_or_default();
+    let image = gen
+        .generate(&bytes)
+        .or_else(|_| Err(StatusCode::BAD_REQUEST))?;
 
-    let code = QrCode::new(bytes).or_else(|_| Err(StatusCode::BAD_REQUEST))?;
+    match gen.format {
+        Format::Svg => Ok(QRResponse::Svg(image.into())),
 
-    match accept.as_str() {
-        "image/svg+xml" => {
-            let image = code
-                .render()
-                .min_dimensions(200, 200)
-                .dark_color(svg::Color("#000"))
-                .light_color(svg::Color("#fff".into()))
-                .build();
-
-            Ok(QRResponse::Svg(image.into()))
-        }
-
-        "text/html" => {
-            let image = code
-                .render()
-                .min_dimensions(200, 200)
-                .dark_color(svg::Color("#000"))
-                .light_color(svg::Color("#fff".into()))
-                .build();
-
+        Format::Html => {
             let html = TEMPLATE
                 .replace("{{ content }}", &image)
-                .replace("{{ help }}", &txt_to_html(HELP));
+                .replace("{{ help }}", &HTML_HELP);
             Ok(QRResponse::Html(html))
         }
 
-        _ => {
-            let image = code
-                .render::<unicode::Dense1x2>()
-                .min_dimensions(20, 20)
-                .dark_color(unicode::Dense1x2::Dark)
-                .light_color(unicode::Dense1x2::Light)
-                .build();
-
-            Ok(QRResponse::Unicode(format!("{}\n", image)))
-        }
+        Format::Unicode => Ok(QRResponse::Unicode(format!("{}\n", image))),
     }
 }
 
 async fn get_handler(
     OriginalUri(uri): OriginalUri,
-    Accept(accept): Accept,
+    QRGenerator(gen): QRGenerator,
 ) -> Result<QRResponse, StatusCode> {
     let (_, path) = uri.path().split_once('/').unwrap_or_default();
 
-    let accept = accept
-        .and_then(|a| {
-            a.into_iter()
-                .find(|a| a == "image/svg+xml" || a == "text/html")
-                .map(String::from)
-        })
-        .map(|s| s.to_lowercase())
-        .unwrap_or_default();
-
     if path.is_empty() {
-        return match accept.as_str() {
-            "text/html" => {
+        return match gen.format {
+            Format::Html => {
                 let html = TEMPLATE
                     .replace("{{ content }}", "")
-                    .replace("{{ help }}", &txt_to_html(HELP));
+                    .replace("{{ help }}", &HTML_HELP);
                 Ok(QRResponse::Html(html))
             }
-            _ => Ok(QRResponse::Plain(HELP.into())),
+            Format::Unicode => Ok(QRResponse::Plain(HELP.to_string())),
+            Format::Svg => Err(StatusCode::BAD_REQUEST),
         };
     }
 
@@ -307,44 +304,52 @@ async fn get_handler(
         .map(|q| format!("{}?{}", path, q))
         .unwrap_or_else(|| path.to_string());
 
-    let code = QrCode::new(input.as_bytes())
+    let image = gen
+        .generate(&input.as_bytes())
         .or_else(|_| Err(StatusCode::BAD_REQUEST))?;
 
-    match accept.as_str() {
-        "image/svg+xml" => {
-            let image = code
-                .render()
-                .min_dimensions(200, 200)
-                .dark_color(svg::Color("#000"))
-                .light_color(svg::Color("#fff".into()))
-                .build();
+    match gen.format {
+        Format::Svg => Ok(QRResponse::Svg(image.into())),
 
-            Ok(QRResponse::Svg(image.into()))
-        }
-
-        "text/html" => {
-            let image = code
-                .render()
-                .min_dimensions(200, 200)
-                .dark_color(svg::Color("#000"))
-                .light_color(svg::Color("#fff".into()))
-                .build();
-
+        Format::Html => {
             let html = TEMPLATE
                 .replace("{{ content }}", &image)
-                .replace("{{ help }}", &txt_to_html(HELP));
+                .replace("{{ help }}", &HELP);
             Ok(QRResponse::Html(html))
         }
 
-        _ => {
-            let image = code
-                .render::<unicode::Dense1x2>()
-                .min_dimensions(20, 20)
-                .dark_color(unicode::Dense1x2::Dark)
-                .light_color(unicode::Dense1x2::Light)
-                .build();
-
-            Ok(QRResponse::Unicode(format!("{}\n", image)))
-        }
+        Format::Unicode => Ok(QRResponse::Unicode(format!("{}\n", image))),
     }
+}
+
+fn txt_to_html(txt: &str) -> String {
+    let mut result = String::new();
+    for word in txt.split(' ') {
+        if word.starts_with("http://")
+            || word.starts_with("https://")
+            || word.starts_with("qrcode.show")
+            || word.starts_with("qrqr.show")
+        {
+            let link = word.split_whitespace().next().unwrap_or_default();
+            if link.starts_with("http://") || link.starts_with("https://") {
+                result.push_str(&format!(
+                    r#"<a href="{link}">{link}</a>"#,
+                    link = link
+                ));
+            } else {
+                result.push_str(&format!(
+                    r#"<a href="//{link}">{link}</a>"#,
+                    link = link
+                ));
+            };
+
+            result.push_str(&word.replacen(link, "", 1));
+        } else {
+            result.push_str(word);
+        }
+
+        result.push(' ');
+    }
+
+    result
 }
