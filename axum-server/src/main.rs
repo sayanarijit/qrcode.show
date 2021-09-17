@@ -242,7 +242,6 @@ impl IntoResponse for QRResponse {
 }
 
 fn generate(bytes: &[u8], gen: &Generator) -> Result<QRResponse, StatusCode> {
-    println!("{:?}", gen);
     let image = gen
         .generate(&bytes)
         .or_else(|_| Err(StatusCode::BAD_REQUEST))?;

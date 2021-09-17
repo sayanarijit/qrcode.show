@@ -137,17 +137,8 @@
       @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
       @media print {
-        body * {
-          visibility: hidden;
-        }
-
-        #printarea,
-        #printarea * {
-          visibility: visible;
-        }
-
-        #printarea #qrcontrols * {
-          visibility: hidden;
+        #help *, #demo *, #qrcontrols *, #form * {
+          display: none;
         }
 
         #printarea {
@@ -155,6 +146,7 @@
           left: 0;
           top: 0;
         }
+
       }
 
       body,
@@ -196,7 +188,7 @@
         text-align: center;
       }
 
-      .help {
+      #help {
         text-align: left;
         overflow: auto;
       }
@@ -235,20 +227,20 @@
         </p>
       </div>
 
-      <div class="form">
+      <div id="form">
         <textarea id="data" required="required"></textarea>
         <button id="submit">Generate</button>
       </div>
 
       <br />
 
-      <div class="demo">
+      <div id="demo">
         <video controls>
           <source src="https://cdn.qrcode.show/__res__/demo.mp4" type="video/mp4" />
         </video>
       </div>
 
-      <div class="help">
+      <div id="help">
         <h3>❯ curl qrcode.show</h3>
         <pre>{{ help }}</pre>
       </div>
