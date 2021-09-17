@@ -110,46 +110,49 @@ pub async fn main(mut req: Request, _env: Env) -> Result<Response> {
     // Add as many routes as your Worker needs! Each route will get a `Request` for handling HTTP
     // functionality and a `RouteContext` which you can use to  and get route parameters and
     // Environment bindings like KV Stores, Durable Objects, Secrets, and Variables.
-    if matches!(req.method(), Method::Post) {
-        let bytes = req.bytes().await.unwrap();
+    match req.method() {
+        Method::Post => {
+            let bytes = req.bytes().await.unwrap();
 
-        if bytes.is_empty() {
-            Response::error("Bad Request", 400)
-        } else {
-            let gen = generator_from_headers(req.headers())?;
-            generate(&bytes, &gen)
-        }
-    } else if matches!(req.method(), Method::Get) {
-        let gen = generator_from_headers(req.headers())?;
-
-        let path = req
-            .path()
-            .split_once('/')
-            .map(|(_, p)| p.to_string())
-            .unwrap_or_default();
-
-        if path.is_empty() {
-            match gen.format {
-                Format::Html => {
-                    let html = TEMPLATE
-                        .replace("{{ content }}", "")
-                        .replace("{{ help }}", &HTML_HELP);
-                    Response::from_html(html)
-                }
-                Format::Unicode => Response::ok(HELP),
-                Format::Svg => Response::error("Bad request", 400),
+            if bytes.is_empty() {
+                Response::error("Bad Request", 400)
+            } else {
+                let gen = generator_from_headers(req.headers())?;
+                generate(&bytes, &gen)
             }
-        } else {
-            let path = req
-                .url()?
-                .query()
-                .map(|q| format!("{}?{}", path, q))
-                .unwrap_or_else(|| path.to_string());
-
-            let bytes = path.as_bytes();
-            generate(bytes, &gen)
         }
-    } else {
-        Response::error("Method Not Allowed", 405)
+
+        Method::Head | Method::Get => {
+            let gen = generator_from_headers(req.headers())?;
+
+            let path = req
+                .path()
+                .split_once('/')
+                .map(|(_, p)| p.to_string())
+                .unwrap_or_default();
+
+            if path.is_empty() {
+                match gen.format {
+                    Format::Html => {
+                        let html = TEMPLATE
+                            .replace("{{ content }}", "")
+                            .replace("{{ help }}", &HTML_HELP);
+                        Response::from_html(html)
+                    }
+                    Format::Unicode => Response::ok(HELP),
+                    Format::Svg => Response::error("Bad request", 400),
+                }
+            } else {
+                let path = req
+                    .url()?
+                    .query()
+                    .map(|q| format!("{}?{}", path, q))
+                    .unwrap_or_else(|| path.to_string());
+
+                let bytes = path.as_bytes();
+                generate(bytes, &gen)
+            }
+        }
+        _ => Response::error("Method Not Allowed", 405),
     }
 }
