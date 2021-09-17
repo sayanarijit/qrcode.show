@@ -26,10 +26,11 @@ PARAMETERS:
 
     Accept                      Specify the output type
                                 Options:
+                                    application/octet-stream
                                     text/plain
                                     image/svg+xml
                                     text/html
-                                Default: text/plain
+                                Default: application/octet-stream
 
     X-QR-Min-Width              Specify the minimum width
 

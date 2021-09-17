@@ -89,8 +89,10 @@ fn generate(bytes: &[u8], gen: &Generator) -> Result<Response> {
             }
 
             Format::Unicode => {
-                Response::from_bytes(format!("{}\n", image).as_bytes().to_vec())
+                Response::from_bytes(format!("{}\n", image).into())
             }
+
+            Format::PlainText => Response::ok(format!("{}\n", image)),
         },
     }
 }
@@ -139,7 +141,7 @@ pub async fn main(mut req: Request, _env: Env) -> Result<Response> {
                             .replace("{{ help }}", &HTML_HELP);
                         Response::from_html(html)
                     }
-                    Format::Unicode => Response::ok(HELP),
+                    Format::PlainText | Format::Unicode => Response::ok(HELP),
                     Format::Svg => Response::error("Bad request", 400),
                 }
             } else {

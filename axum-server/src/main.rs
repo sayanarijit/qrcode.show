@@ -257,6 +257,8 @@ fn generate(bytes: &[u8], gen: &Generator) -> Result<QRResponse, StatusCode> {
         }
 
         Format::Unicode => Ok(QRResponse::Unicode(format!("{}\n", image))),
+
+        Format::PlainText => Ok(QRResponse::Plain(format!("{}\n", image))),
     }
 }
 
@@ -295,7 +297,9 @@ async fn get_handler(
                     .replace("{{ help }}", &HTML_HELP);
                 Ok(QRResponse::Html(html))
             }
-            Format::Unicode => Ok(QRResponse::Plain(HELP.to_string())),
+            Format::PlainText | Format::Unicode => {
+                Ok(QRResponse::Plain(HELP.to_string()))
+            }
             Format::Svg => Err(StatusCode::BAD_REQUEST),
         }
     } else {

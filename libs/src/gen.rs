@@ -10,6 +10,7 @@ pub enum Format {
     Svg,
     Html,
     Unicode,
+    PlainText,
 }
 
 impl Default for Format {
@@ -23,6 +24,7 @@ impl From<&str> for Format {
         match headerval.to_lowercase().as_str() {
             "text/html" => Self::Html,
             "image/svg+xml" => Self::Svg,
+            "text/plain" => Self::PlainText,
             _ => Self::default(),
         }
     }
@@ -105,8 +107,8 @@ impl Generator {
             Format::Svg | Format::Html => code
                 .render()
                 .min_dimensions(
-                    self.min_width.unwrap_or(200),
-                    self.min_height.unwrap_or(200),
+                    self.min_width.unwrap_or(240),
+                    self.min_height.unwrap_or(240),
                 )
                 .dark_color(svg::Color(
                     self.dark_color
@@ -120,6 +122,11 @@ impl Generator {
                         .map(|s| s.as_str())
                         .unwrap_or("#fff"),
                 ))
+                .build(),
+
+            Format::PlainText => code
+                .render::<char>()
+                .module_dimensions(2, 1)
                 .build(),
 
             Format::Unicode => code
