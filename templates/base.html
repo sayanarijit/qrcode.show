@@ -2,29 +2,44 @@
 <html itemscope itemtype="https://schema.org/Product">
   <head>
     <meta charset="utf-8" />
-    <base href="/" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"
+    />
+
     <title>Generate & Show QR Code</title>
+    <meta name="title" content="Generate & Show QR Code" />
     <meta
       name="description"
-      lang="en"
       content="Generate QR code easily for free - QR Code Generation as a Service"
     />
 
-    <meta
-      name="twitter:image:src"
-      content="https://cdn.qrcode.show/__res__/social.jpg"
-    />
-    <meta name="twitter:site" content="https://QRcode.show" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://qrcode.show/" />
     <meta
       name="twitter:title"
-      content="Generate QR code easily for free - QR Code Generation as a Service"
+      content="Generate & Show QR Code"
     />
     <meta
       name="twitter:description"
       content="Generate QR code easily for free - QR Code Generation as a Service"
     />
+    <meta
+      name="twitter:image"
+      content="https://cdn.qrcode.show/__res__/social.jpg"
+    />
+    <meta name="twitter:site" content="https://QRcode.show" />
 
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://qrcode.show/" />
+    <meta
+      property="og:title"
+      content="Generate & Show QR Code"
+    />
+    <meta
+      property="og:description"
+      content="Generate QR code easily for free - QR Code Generation as a Service"
+    />
     <meta
       property="og:image"
       content="https://cdn.qrcode.show/__res__/social.jpg"
@@ -32,22 +47,6 @@
     <meta
       property="og:image:alt"
       content="Generate QR code easily for free - QR Code Generation as a Service"
-    />
-    <meta property="og:site_name" content="QRcode.show" />
-    <meta property="og:type" content="object" />
-    <meta
-      property="og:title"
-      content="Generate QR code easily for free - QR Code Generation as a Service"
-    />
-    <meta property="og:url" content="https://qrcode.show" />
-    <meta
-      property="og:description"
-      content="Generate QR code easily for free - QR Code Generation as a Service"
-    />
-
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"
     />
 
     <meta itemprop="name" content="Generate & Show QR Code" />
@@ -125,7 +124,7 @@
       sizes="16x16"
       href="https://cdn.qrcode.show/__res__/icons/favicon-16x16.png"
     />
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" href="https://cdn.qrcode.show/manifest.json" />
     <meta name="msapplication-TileColor" content="#ffffff" />
     <meta
       name="msapplication-TileImage"
@@ -137,7 +136,10 @@
       @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
       @media print {
-        #help *, #demo *, #qrcontrols *, #form * {
+        #help *,
+        #demo *,
+        #qrcontrols *,
+        #form * {
           display: none;
         }
 
@@ -146,7 +148,6 @@
           left: 0;
           top: 0;
         }
-
       }
 
       body,
@@ -236,7 +237,10 @@
 
       <div id="demo">
         <video controls>
-          <source src="https://cdn.qrcode.show/__res__/demo.mp4" type="video/mp4" />
+          <source
+            src="https://cdn.qrcode.show/__res__/demo.mp4"
+            type="video/mp4"
+          />
         </video>
       </div>
 
