@@ -3,12 +3,12 @@ use axum::{
     extract::OriginalUri, extract::RawBody, extract::RequestParts,
     handler::get, http::header, http::header::HeaderName,
     http::header::HeaderValue, http::Response, http::StatusCode,
-    response::IntoResponse, service, Router,
+    response::IntoResponse, Router,
 };
 use std::convert::Infallible;
 use std::env;
 use std::net::SocketAddr;
-use tower_http::{services::ServeDir, trace::TraceLayer};
+use tower_http::trace::TraceLayer;
 
 use libs::EcLevel;
 use libs::Format;
@@ -28,50 +28,6 @@ async fn main() {
 
     let app = Router::new()
         .nest("/", get(get_handler).post(post_handler))
-        .nest(
-            "/favicon.ico",
-            service::get(ServeDir::new("./static/__res__")).handle_error(
-                |error: std::io::Error| {
-                    Ok::<_, Infallible>((
-                        StatusCode::INTERNAL_SERVER_ERROR,
-                        format!("Unhandled internal error: {}", error),
-                    ))
-                },
-            ),
-        )
-        .nest(
-            "/manifest.json",
-            service::get(ServeDir::new("./static/__res__")).handle_error(
-                |error: std::io::Error| {
-                    Ok::<_, Infallible>((
-                        StatusCode::INTERNAL_SERVER_ERROR,
-                        format!("Unhandled internal error: {}", error),
-                    ))
-                },
-            ),
-        )
-        .nest(
-            "/browserconfig.xml",
-            service::get(ServeDir::new("./static/__res__")).handle_error(
-                |error: std::io::Error| {
-                    Ok::<_, Infallible>((
-                        StatusCode::INTERNAL_SERVER_ERROR,
-                        format!("Unhandled internal error: {}", error),
-                    ))
-                },
-            ),
-        )
-        .nest(
-            "/__res__",
-            service::get(ServeDir::new("./static/__res__")).handle_error(
-                |error: std::io::Error| {
-                    Ok::<_, Infallible>((
-                        StatusCode::INTERNAL_SERVER_ERROR,
-                        format!("Unhandled internal error: {}", error),
-                    ))
-                },
-            ),
-        )
         .layer(TraceLayer::new_for_http())
         .check_infallible();
 
