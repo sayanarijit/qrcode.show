@@ -83,6 +83,14 @@ SHELL FUNCTIONS:
           curl -d @${file} https://qrcode.show -H "Accept: image/svg+xml"
         }
 
+        qrserve () {
+          local port=${1:-8080}
+          local dir=${2:-.}
+          ip="$(ifconfig | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | fzf --prompt IP:)" \
+            && echo http://$ip:$port | qrcode \
+            && python -m http.server $port -b $ip -d $dir
+        }
+
 FEATURES:
     
     * No data collection or retention
