@@ -223,14 +223,7 @@
 
       <br />
 
-      <div id="demo">
-        <video controls>
-          <source
-            src="https://cdn.qrcode.show/__res__/demo.mp4"
-            type="video/mp4"
-          />
-        </video>
-      </div>
+      <div id="demo"></div>
 
       <div id="help">
         <h3>❯ curl qrcode.show</h3>
@@ -249,6 +242,17 @@
         $('#print').on('click', function (event) {
           window.print();
         });
+
+        let demos = ['demo.mp4', 'lets-be-nice.mp4'];
+        let randvideo = demos[Math.ceil(Math.random() * 10) % demos.length];
+        $('#demo').html(`
+          <video controls>
+            <source
+              src="https://cdn.qrcode.show/__res__/${randvideo}"
+              type="video/mp4"
+            />
+          </video>
+        `);
 
         $('#submit').on('click', function (event) {
           event.preventDefault();
