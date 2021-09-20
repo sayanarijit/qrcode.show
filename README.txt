@@ -28,8 +28,9 @@ PARAMETERS:
                                 Options:
                                     application/octet-stream
                                     text/plain
-                                    image/svg+xml
                                     text/html
+                                    image/svg+xml
+                                    image/png
                                 Default: application/octet-stream
 
     X-QR-Min-Width              Specify the minimum width
@@ -100,7 +101,6 @@ FEATURES:
 
 TODO:
     
-    * Download JPEG, PNG support
     * Support more parameters
     * Get a logo
     * Support dynamic QR codes

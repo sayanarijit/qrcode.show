@@ -147,7 +147,8 @@ enum QRResponse {
     Plain(String),
     Html(String),
     Svg(String),
-    Unicode(String),
+    Png(Vec<u8>),
+    Unicode(Vec<u8>),
 }
 
 impl IntoResponse for QRResponse {
@@ -193,6 +194,15 @@ impl IntoResponse for QRResponse {
                 );
                 res
             }
+
+            Self::Png(png) => {
+                let mut res = Response::new(png.into());
+                res.headers_mut().insert(
+                    header::CONTENT_TYPE,
+                    HeaderValue::from_static("image/png"),
+                );
+                res
+            }
         }
     }
 }
@@ -203,18 +213,24 @@ fn generate(bytes: &[u8], gen: &Generator) -> Result<QRResponse, StatusCode> {
         .or_else(|_| Err(StatusCode::BAD_REQUEST))?;
 
     match gen.format {
-        Format::Svg => Ok(QRResponse::Svg(image.into())),
+        Format::Svg => {
+            Ok(QRResponse::Svg(String::from_utf8_lossy(&image).to_string()))
+        }
+
+        Format::Png => Ok(QRResponse::Png(image)),
 
         Format::Html => {
             let html = TEMPLATE
-                .replace("{{ content }}", &image)
+                .replace("{{ content }}", &String::from_utf8_lossy(&image))
                 .replace("{{ help }}", &HTML_HELP);
             Ok(QRResponse::Html(html))
         }
 
-        Format::Unicode => Ok(QRResponse::Unicode(format!("{}\n", image))),
+        Format::Unicode => Ok(QRResponse::Unicode(image)),
 
-        Format::PlainText => Ok(QRResponse::Plain(format!("{}\n", image))),
+        Format::PlainText => Ok(QRResponse::Plain(
+            String::from_utf8_lossy(&image).to_string(),
+        )),
     }
 }
 
@@ -256,7 +272,7 @@ async fn get_handler(
             Format::PlainText | Format::Unicode => {
                 Ok(QRResponse::Plain(HELP.to_string()))
             }
-            Format::Svg => Err(StatusCode::BAD_REQUEST),
+            Format::Png | Format::Svg => Err(StatusCode::BAD_REQUEST),
         }
     } else {
         let input = uri

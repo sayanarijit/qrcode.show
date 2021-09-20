@@ -1,9 +1,15 @@
+use image::codecs::png::PngEncoder;
+use image::ColorType;
+use image::Luma;
 use qrcode::render::svg;
 use qrcode::render::unicode;
+use qrcode::types::QrError;
 use qrcode::EcLevel;
 use qrcode::QrCode;
 use qrcode::QrResult;
 use qrcode::Version;
+
+use image::EncodableLayout;
 
 #[derive(Debug, Clone, Copy)]
 pub enum Format {
@@ -11,6 +17,7 @@ pub enum Format {
     Html,
     Unicode,
     PlainText,
+    Png,
 }
 
 impl Default for Format {
@@ -24,6 +31,7 @@ impl From<&str> for Format {
         match headerval.to_lowercase().as_str() {
             "text/html" => Self::Html,
             "image/svg+xml" => Self::Svg,
+            "image/png" => Self::Png,
             "text/plain" => Self::PlainText,
             _ => Self::default(),
         }
@@ -75,7 +83,7 @@ pub struct Generator {
 }
 
 impl Generator {
-    pub fn generate(&self, input: &[u8]) -> QrResult<String> {
+    pub fn generate(&self, input: &[u8]) -> QrResult<Vec<u8>> {
         use EcLevel::*;
         use Version::*;
         use VersionType::*;
@@ -104,40 +112,72 @@ impl Generator {
         let code = code?;
 
         let image = match self.format {
-            Format::Svg | Format::Html => code
-                .render()
-                .min_dimensions(
-                    self.min_width.unwrap_or(240),
-                    self.min_height.unwrap_or(240),
-                )
-                .dark_color(svg::Color(
-                    self.dark_color
-                        .as_ref()
-                        .map(|s| s.as_str())
-                        .unwrap_or("#000"),
-                ))
-                .light_color(svg::Color(
-                    self.light_color
-                        .as_ref()
-                        .map(|s| s.as_str())
-                        .unwrap_or("#fff"),
-                ))
-                .build(),
+            Format::Svg | Format::Html => {
+                let mut bytes = code
+                    .render()
+                    .min_dimensions(
+                        self.min_width.unwrap_or(240),
+                        self.min_height.unwrap_or(240),
+                    )
+                    .dark_color(svg::Color(
+                        self.dark_color
+                            .as_ref()
+                            .map(|s| s.as_str())
+                            .unwrap_or("#000"),
+                    ))
+                    .light_color(svg::Color(
+                        self.light_color
+                            .as_ref()
+                            .map(|s| s.as_str())
+                            .unwrap_or("#fff"),
+                    ))
+                    .build()
+                    .into_bytes();
+                bytes.push(b'\n');
+                bytes
+            }
 
-            Format::PlainText => code
-                .render::<char>()
-                .module_dimensions(2, 1)
-                .build(),
+            Format::Png => {
+                let image = code
+                    .render::<Luma<u8>>()
+                    .min_dimensions(
+                        self.min_width.unwrap_or(240),
+                        self.min_height.unwrap_or(240),
+                    )
+                    .build();
+                let bytes = image.as_bytes();
+                let mut result: Vec<u8> = Default::default();
+                let encoder = PngEncoder::new(&mut result);
+                encoder
+                    .encode(bytes, image.width(), image.height(), ColorType::L8)
+                    .or_else(|_| Err(QrError::UnsupportedCharacterSet))?;
+                result
+            }
 
-            Format::Unicode => code
-                .render::<unicode::Dense1x2>()
-                .min_dimensions(
-                    self.min_width.unwrap_or(20),
-                    self.min_height.unwrap_or(20),
-                )
-                .dark_color(unicode::Dense1x2::Dark)
-                .light_color(unicode::Dense1x2::Light)
-                .build(),
+            Format::PlainText => {
+                let mut bytes = code
+                    .render::<char>()
+                    .module_dimensions(2, 1)
+                    .build()
+                    .into_bytes();
+                bytes.push(b'\n');
+                bytes
+            }
+
+            Format::Unicode => {
+                let mut bytes = code
+                    .render::<unicode::Dense1x2>()
+                    .min_dimensions(
+                        self.min_width.unwrap_or(20),
+                        self.min_height.unwrap_or(20),
+                    )
+                    .dark_color(unicode::Dense1x2::Dark)
+                    .light_color(unicode::Dense1x2::Light)
+                    .build()
+                    .into_bytes();
+                bytes.push(b'\n');
+                bytes
+            }
         };
 
         Ok(image)

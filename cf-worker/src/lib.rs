@@ -75,7 +75,7 @@ fn generate(bytes: &[u8], gen: &Generator) -> Result<Response> {
         Ok(image) => match gen.format {
             Format::Html => {
                 let html = TEMPLATE
-                    .replace("{{ content }}", &image)
+                    .replace("{{ content }}", &String::from_utf8_lossy(&image))
                     .replace("{{ help }}", &HTML_HELP);
 
                 Response::from_html(html)
@@ -84,15 +84,18 @@ fn generate(bytes: &[u8], gen: &Generator) -> Result<Response> {
             Format::Svg => {
                 let mut headers = Headers::new();
                 headers.set("Content-Type", "image/svg+xml")?;
-
-                Response::ok(image).map(|r| r.with_headers(headers))
+                Response::from_bytes(image).map(|r| r.with_headers(headers))
             }
 
-            Format::Unicode => {
-                Response::from_bytes(format!("{}\n", image).into())
+            Format::Png => {
+                let mut headers = Headers::new();
+                headers.set("Content-Type", "image/png")?;
+                Response::from_bytes(image).map(|r| r.with_headers(headers))
             }
 
-            Format::PlainText => Response::ok(format!("{}\n", image)),
+            Format::Unicode => Response::from_bytes(image),
+
+            Format::PlainText => Response::ok(String::from_utf8_lossy(&image)),
         },
     }
 }
@@ -142,7 +145,9 @@ pub async fn main(mut req: Request, _env: Env) -> Result<Response> {
                         Response::from_html(html)
                     }
                     Format::PlainText | Format::Unicode => Response::ok(HELP),
-                    Format::Svg => Response::error("Bad request", 400),
+                    Format::Png | Format::Svg => {
+                        Response::error("Bad request", 400)
+                    }
                 }
             } else {
                 let path = req
