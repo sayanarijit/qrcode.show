@@ -31,6 +31,7 @@ PARAMETERS:
                                     text/html
                                     image/svg+xml
                                     image/png
+                                    image/jpeg
                                 Default: application/octet-stream
 
     X-QR-Min-Width              Specify the minimum width
