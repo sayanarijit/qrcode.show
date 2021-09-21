@@ -93,6 +93,12 @@ fn generate(bytes: &[u8], gen: &Generator) -> Result<Response> {
                 Response::from_bytes(image).map(|r| r.with_headers(headers))
             }
 
+            Format::Jpeg => {
+                let mut headers = Headers::new();
+                headers.set("Content-Type", "image/jpeg")?;
+                Response::from_bytes(image).map(|r| r.with_headers(headers))
+            }
+
             Format::Unicode => Response::from_bytes(image),
 
             Format::PlainText => Response::ok(String::from_utf8_lossy(&image)),
@@ -145,7 +151,7 @@ pub async fn main(mut req: Request, _env: Env) -> Result<Response> {
                         Response::from_html(html)
                     }
                     Format::PlainText | Format::Unicode => Response::ok(HELP),
-                    Format::Png | Format::Svg => {
+                    Format::Jpeg | Format::Png | Format::Svg => {
                         Response::error("Bad request", 400)
                     }
                 }

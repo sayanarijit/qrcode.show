@@ -148,6 +148,7 @@ enum QRResponse {
     Html(String),
     Svg(String),
     Png(Vec<u8>),
+    Jpeg(Vec<u8>),
     Unicode(Vec<u8>),
 }
 
@@ -203,6 +204,15 @@ impl IntoResponse for QRResponse {
                 );
                 res
             }
+
+            Self::Jpeg(jpeg) => {
+                let mut res = Response::new(jpeg.into());
+                res.headers_mut().insert(
+                    header::CONTENT_TYPE,
+                    HeaderValue::from_static("image/jpeg"),
+                );
+                res
+            }
         }
     }
 }
@@ -218,6 +228,8 @@ fn generate(bytes: &[u8], gen: &Generator) -> Result<QRResponse, StatusCode> {
         }
 
         Format::Png => Ok(QRResponse::Png(image)),
+
+        Format::Jpeg => Ok(QRResponse::Jpeg(image)),
 
         Format::Html => {
             let html = TEMPLATE
@@ -272,7 +284,9 @@ async fn get_handler(
             Format::PlainText | Format::Unicode => {
                 Ok(QRResponse::Plain(HELP.to_string()))
             }
-            Format::Png | Format::Svg => Err(StatusCode::BAD_REQUEST),
+            Format::Jpeg | Format::Png | Format::Svg => {
+                Err(StatusCode::BAD_REQUEST)
+            }
         }
     } else {
         let input = uri

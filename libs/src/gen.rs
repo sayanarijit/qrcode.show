@@ -1,3 +1,4 @@
+use image::codecs::jpeg::JpegEncoder;
 use image::codecs::png::PngEncoder;
 use image::ColorType;
 use image::Luma;
@@ -18,6 +19,7 @@ pub enum Format {
     Unicode,
     PlainText,
     Png,
+    Jpeg,
 }
 
 impl Default for Format {
@@ -31,8 +33,9 @@ impl From<&str> for Format {
         match headerval.to_lowercase().as_str() {
             "text/html" => Self::Html,
             "image/svg+xml" => Self::Svg,
-            "image/png" => Self::Png,
             "text/plain" => Self::PlainText,
+            "image/png" => Self::Png,
+            "image/jpeg" => Self::Jpeg,
             _ => Self::default(),
         }
     }
@@ -148,6 +151,23 @@ impl Generator {
                 let bytes = image.as_bytes();
                 let mut result: Vec<u8> = Default::default();
                 let encoder = PngEncoder::new(&mut result);
+                encoder
+                    .encode(bytes, image.width(), image.height(), ColorType::L8)
+                    .or_else(|_| Err(QrError::UnsupportedCharacterSet))?;
+                result
+            }
+
+            Format::Jpeg => {
+                let image = code
+                    .render::<Luma<u8>>()
+                    .min_dimensions(
+                        self.min_width.unwrap_or(240),
+                        self.min_height.unwrap_or(240),
+                    )
+                    .build();
+                let bytes = image.as_bytes();
+                let mut result: Vec<u8> = Default::default();
+                let mut encoder = JpegEncoder::new(&mut result);
                 encoder
                     .encode(bytes, image.width(), image.height(), ColorType::L8)
                     .or_else(|_| Err(QrError::UnsupportedCharacterSet))?;
