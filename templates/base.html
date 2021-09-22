@@ -257,29 +257,12 @@
         $('#submit').on('click', function (event) {
           event.preventDefault();
 
-          console.clear();
           $('#qr').html(
             '<img src="https://via.placeholder.com/240/fff/000/?text=Loading..." height="240" width="240" />'
           );
           $('#qrcontrols').hide();
 
           let data = $('#data').val();
-
-          $.ajax({
-            type: 'POST',
-            url: '/',
-            headers: {
-              'Content-Type': 'text/plain;charset=UTF-8',
-              Accept: 'text/plain',
-            },
-            data: data,
-            success: function (resp) {
-              console.log(resp);
-            },
-            error: function () {
-              console.error('ERROR! Try again...');
-            },
-          });
 
           $.ajax({
             type: 'POST',
