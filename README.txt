@@ -71,24 +71,26 @@ PARAMETER EXAMPLES:
 SHELL FUNCTIONS:
 
     Shell functions that can be added to `.bashrc` or `.bash_profle` for
-    quickly generating QR codes from the command line. The command takes a
-    filename or reads from stdin if none was supplied and outputs the QR code
-    to stdout: `qrcode /PATH/TO/INPUT` or `echo INPUT | qrcode`
+    quickly generating QR codes from the command line. The command takes the
+    argument as input or reads from stdin if none was supplied and outputs the
+    QR code to stdout: `qrcode INPUT` or `echo INPUT | qrcode`
 
         qrcode () {
-          local file=${1:-/dev/stdin}
-          curl -d @${file} https://qrcode.show
+          local input="$*"
+          [ -z "$input" ] && local input="@/dev/stdin"
+          curl -d "$input" https://qrcode.show
         }
 
         qrsvg () {
-          local file=${1:-/dev/stdin}
-          curl -d @${file} https://qrcode.show -H "Accept: image/svg+xml"
+          local input="$*"
+          [ -z "$input" ] && local input="@/dev/stdin"
+          curl -d "${input}" https://qrcode.show -H "Accept: image/svg+xml"
         }
 
         qrserve () {
           local port=${1:-8080}
           local dir=${2:-.}
-          ip="$(ifconfig | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | fzf --prompt IP:)" \
+          local ip="$(ifconfig | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | fzf --prompt IP:)" \
             && echo http://$ip:$port | qrcode \
             && python -m http.server $port -b $ip -d $dir
         }
