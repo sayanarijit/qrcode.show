@@ -84,26 +84,44 @@ fn generate(bytes: &[u8], gen: &Generator) -> Result<Response> {
             Format::Svg => {
                 let mut headers = Headers::new();
                 headers.set("Content-Type", "image/svg+xml")?;
-                Response::from_bytes(image).map(|r| r.with_headers(headers))
+                Response::from_bytes(image)
+                    .map(|r| r.with_headers(headers))
+                    .and_then(cors)
             }
 
             Format::Png => {
                 let mut headers = Headers::new();
                 headers.set("Content-Type", "image/png")?;
-                Response::from_bytes(image).map(|r| r.with_headers(headers))
+                Response::from_bytes(image)
+                    .map(|r| r.with_headers(headers))
+                    .and_then(cors)
             }
 
             Format::Jpeg => {
                 let mut headers = Headers::new();
                 headers.set("Content-Type", "image/jpeg")?;
-                Response::from_bytes(image).map(|r| r.with_headers(headers))
+                Response::from_bytes(image)
+                    .map(|r| r.with_headers(headers))
+                    .and_then(cors)
             }
 
-            Format::Unicode => Response::from_bytes(image),
+            Format::Unicode => {
+                Response::from_bytes(image).and_then(cors)
+            }
 
-            Format::PlainText => Response::ok(String::from_utf8_lossy(&image)),
+            Format::PlainText => {
+                Response::ok(String::from_utf8_lossy(&image)).and_then(cors)
+            }
         },
     }
+}
+
+fn cors(mut res: Response) -> Result<Response> {
+    let headers = res.headers_mut();
+    headers.set("Access-Control-Allow-Methods", "HEAD, POST, GET, OPTIONS")?;
+    headers.set("Access-Control-Allow-Origin", "*")?;
+    headers.set("Access-Control-Allow-Headers", "*")?;
+    Ok(res)
 }
 
 #[event(fetch)]
@@ -122,6 +140,14 @@ pub async fn main(mut req: Request, _env: Env) -> Result<Response> {
     // functionality and a `RouteContext` which you can use to  and get route parameters and
     // Environment bindings like KV Stores, Durable Objects, Secrets, and Variables.
     match req.method() {
+        Method::Options => {
+            let headers = Headers::new();
+
+            Response::empty()
+                .map(|r| r.with_headers(headers))
+                .and_then(cors)
+        }
+
         Method::Post => {
             let bytes = req.bytes().await.unwrap();
 
