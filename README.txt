@@ -64,6 +64,12 @@ PARAMETERS:
                                     H
                                 Default: L
 
+    X-QR-Quiet-zone             Specify whether the quiet zone is added
+                                Options:
+                                    true
+                                    false
+                                Default: true
+
 PARAMETER EXAMPLES:
 
     $ curl qrcode.show/INPUT -H "Accept: image/svg+xml"
