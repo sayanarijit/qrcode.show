@@ -83,6 +83,8 @@ pub struct Generator {
     pub version_number: Option<i16>,
 
     pub error_correction_level: Option<EcLevel>,
+
+    pub quiet_zone: Option<bool>,
 }
 
 impl Generator {
@@ -134,6 +136,7 @@ impl Generator {
                             .map(|s| s.as_str())
                             .unwrap_or("#fff"),
                     ))
+                    .quiet_zone(self.quiet_zone.unwrap_or(true))
                     .build()
                     .into_bytes();
                 bytes.push(b'\n');
@@ -147,6 +150,7 @@ impl Generator {
                         self.min_width.unwrap_or(240),
                         self.min_height.unwrap_or(240),
                     )
+                    .quiet_zone(self.quiet_zone.unwrap_or(true))
                     .build();
                 let bytes = image.as_bytes();
                 let mut result: Vec<u8> = Default::default();
@@ -164,6 +168,7 @@ impl Generator {
                         self.min_width.unwrap_or(240),
                         self.min_height.unwrap_or(240),
                     )
+                    .quiet_zone(self.quiet_zone.unwrap_or(true))
                     .build();
                 let bytes = image.as_bytes();
                 let mut result: Vec<u8> = Default::default();
@@ -178,6 +183,7 @@ impl Generator {
                 let mut bytes = code
                     .render::<char>()
                     .module_dimensions(2, 1)
+                    .quiet_zone(self.quiet_zone.unwrap_or(true))
                     .build()
                     .into_bytes();
                 bytes.push(b'\n');
@@ -193,6 +199,7 @@ impl Generator {
                     )
                     .dark_color(unicode::Dense1x2::Dark)
                     .light_color(unicode::Dense1x2::Light)
+                    .quiet_zone(self.quiet_zone.unwrap_or(true))
                     .build()
                     .into_bytes();
                 bytes.push(b'\n');

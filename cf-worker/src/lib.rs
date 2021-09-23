@@ -65,6 +65,11 @@ fn generator_from_headers(headers: &Headers) -> Result<Generator> {
         }?;
     }
 
+    if let Some(val) = get_first_header_value(headers, "x-qr-quiet-zone") {
+        gen.quiet_zone =
+            val.parse().map(Some).or_else(|_| Err("Bad Request"))?;
+    }
+
     Ok(gen)
 }
 
