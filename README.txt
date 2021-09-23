@@ -111,13 +111,16 @@ TODO:
 
 SPONSORS:
 
-    Top 5 sponsors get mentioned here
+    1. Swordscode - https://swordscode.com - $5
+
+    Top 5 sponsors get mentioned here (updated monthly)
+    Visit https://opencollective.com/qrcodeshow
 
 CREDITS:
 
     Main Library                https://github.com/kennytm/qrcode-rust
-    Web Server                  https://github.com/tokio-rs/axum
-    Alternate Worker            https://github.com/cloudflare/workers-rs
+    Cloudflare Worker           https://github.com/cloudflare/workers-rs
+    Alternate Web Server        https://github.com/tokio-rs/axum
 
     *Only the direct dependencies for the main business logic are listed here
     Please contact the project maintainer if you are missing from the list
@@ -128,9 +131,6 @@ RELATED LINKS:
 
     Project Repository          https://github.com/sayanarijit/qrcode.show
     Project Maintainer          https://arijitbasu.in
-
-    Donate & Support            https://ko-fi.com/sayanarijit
-                                https://liberapay.com/sayanarijit
 
 COPYRIGHT:
 
