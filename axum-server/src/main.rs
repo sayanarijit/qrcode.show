@@ -142,6 +142,16 @@ where
             }?;
         }
 
+        if let Some(val) = get_first_header_value(
+            &req,
+            HeaderName::from_static("x-qr-quiet-zone"),
+        ) {
+            gen.quiet_zone = val
+                .parse()
+                .map(Some)
+                .or_else(|_| Err(StatusCode::BAD_REQUEST))?;
+        }
+
         Ok(QRGenerator(gen))
     }
 }
