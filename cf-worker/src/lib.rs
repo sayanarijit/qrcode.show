@@ -29,13 +29,11 @@ fn generator_from_headers(headers: &Headers) -> Result<Generator> {
     }
 
     if let Some(val) = get_first_header_value(headers, "x-qr-min-width") {
-        gen.min_width =
-            val.parse().map(Some).or_else(|_| Err("Bad Request"))?;
+        gen.min_width = val.parse().map(Some).map_err(|_| "Bad Request")?;
     }
 
     if let Some(val) = get_first_header_value(headers, "x-qr-min-height") {
-        gen.min_height =
-            val.parse().map(Some).or_else(|_| Err("Bad Request"))?;
+        gen.min_height = val.parse().map(Some).map_err(|_| "Bad Request")?;
     }
 
     if let Some(val) = get_first_header_value(headers, "x-qr-dark-color") {
@@ -52,7 +50,7 @@ fn generator_from_headers(headers: &Headers) -> Result<Generator> {
 
     if let Some(val) = get_first_header_value(headers, "x-qr-version-number") {
         gen.version_number =
-            val.parse().map(Some).or_else(|_| Err("Bad Request"))?;
+            val.parse().map(Some).map_err(|_| "Bad Request")?;
     }
 
     if let Some(val) = get_first_header_value(headers, "x-qr-ec-level") {
@@ -66,15 +64,14 @@ fn generator_from_headers(headers: &Headers) -> Result<Generator> {
     }
 
     if let Some(val) = get_first_header_value(headers, "x-qr-quiet-zone") {
-        gen.quiet_zone =
-            val.parse().map(Some).or_else(|_| Err("Bad Request"))?;
+        gen.quiet_zone = val.parse().map(Some).map_err(|_| "Bad Request")?;
     }
 
     Ok(gen)
 }
 
 fn generate(bytes: &[u8], gen: &Generator) -> Result<Response> {
-    match gen.generate(&bytes) {
+    match gen.generate(bytes) {
         Err(_) => Response::error("Bad Request", 400),
 
         Ok(image) => match gen.format {
@@ -110,9 +107,7 @@ fn generate(bytes: &[u8], gen: &Generator) -> Result<Response> {
                     .and_then(cors)
             }
 
-            Format::Unicode => {
-                Response::from_bytes(image).and_then(cors)
-            }
+            Format::Unicode => Response::from_bytes(image).and_then(cors),
 
             Format::PlainText => {
                 Response::ok(String::from_utf8_lossy(&image)).and_then(cors)
