@@ -125,16 +125,10 @@ impl Generator {
                         self.min_height.unwrap_or(240),
                     )
                     .dark_color(svg::Color(
-                        self.dark_color
-                            .as_ref()
-                            .map(|s| s.as_str())
-                            .unwrap_or("#000"),
+                        self.dark_color.as_deref().unwrap_or("#000"),
                     ))
                     .light_color(svg::Color(
-                        self.light_color
-                            .as_ref()
-                            .map(|s| s.as_str())
-                            .unwrap_or("#fff"),
+                        self.light_color.as_deref().unwrap_or("#fff"),
                     ))
                     .quiet_zone(self.quiet_zone.unwrap_or(true))
                     .build()
@@ -157,7 +151,7 @@ impl Generator {
                 let encoder = PngEncoder::new(&mut result);
                 encoder
                     .encode(bytes, image.width(), image.height(), ColorType::L8)
-                    .or_else(|_| Err(QrError::UnsupportedCharacterSet))?;
+                    .map_err(|_| QrError::UnsupportedCharacterSet)?;
                 result
             }
 
@@ -175,7 +169,7 @@ impl Generator {
                 let mut encoder = JpegEncoder::new(&mut result);
                 encoder
                     .encode(bytes, image.width(), image.height(), ColorType::L8)
-                    .or_else(|_| Err(QrError::UnsupportedCharacterSet))?;
+                    .map_err(|_| QrError::UnsupportedCharacterSet)?;
                 result
             }
 

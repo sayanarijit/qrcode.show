@@ -74,63 +74,57 @@ where
     ) -> Result<Self, Self::Rejection> {
         let mut gen = Generator::default();
 
-        if let Some(val) = get_first_header_value(&req, header::ACCEPT) {
+        if let Some(val) = get_first_header_value(req, header::ACCEPT) {
             gen.format = Format::from(&val);
         }
 
         if let Some(val) = get_first_header_value(
-            &req,
+            req,
             HeaderName::from_static("x-qr-min-width"),
         ) {
-            gen.min_width = val
-                .parse()
-                .map(Some)
-                .or_else(|_| Err(StatusCode::BAD_REQUEST))?;
+            gen.min_width =
+                val.parse().map(Some).map_err(|_| StatusCode::BAD_REQUEST)?;
         }
 
         if let Some(val) = get_first_header_value(
-            &req,
+            req,
             HeaderName::from_static("x-qr-min-height"),
         ) {
-            gen.min_height = val
-                .parse()
-                .map(Some)
-                .or_else(|_| Err(StatusCode::BAD_REQUEST))?;
+            gen.min_height =
+                val.parse().map(Some).map_err(|_| StatusCode::BAD_REQUEST)?;
         }
 
         if let Some(val) = get_first_header_value(
-            &req,
+            req,
             HeaderName::from_static("x-qr-dark-color"),
         ) {
             gen.dark_color = Some(format!("#{}", val));
         }
 
         if let Some(val) = get_first_header_value(
-            &req,
+            req,
             HeaderName::from_static("x-qr-light-color"),
         ) {
             gen.light_color = Some(format!("#{}", val));
         }
 
         if let Some(val) = get_first_header_value(
-            &req,
+            req,
             HeaderName::from_static("x-qr-version-type"),
         ) {
             gen.version_type = val.as_str().into();
         }
 
         if let Some(val) = get_first_header_value(
-            &req,
+            req,
             HeaderName::from_static("x-qr-version-number"),
         ) {
-            gen.version_number = val
-                .parse()
-                .map(Some)
-                .or_else(|_| Err(StatusCode::BAD_REQUEST))?;
+            gen.version_number =
+                val.parse().map(Some).map_err(|_| StatusCode::BAD_REQUEST)?;
         }
 
         if let Some(val) = get_first_header_value(
-            &req,
+            req,
             HeaderName::from_static("x-qr-ec-level"),
         ) {
             gen.error_correction_level = match val.as_str() {
@@ -143,13 +137,11 @@ where
         }
 
         if let Some(val) = get_first_header_value(
-            &req,
+            req,
             HeaderName::from_static("x-qr-quiet-zone"),
         ) {
-            gen.quiet_zone = val
-                .parse()
-                .map(Some)
-                .or_else(|_| Err(StatusCode::BAD_REQUEST))?;
+            gen.quiet_zone =
+                val.parse().map(Some).map_err(|_| StatusCode::BAD_REQUEST)?;
         }
 
         Ok(QRGenerator(gen))
@@ -261,9 +253,7 @@ impl IntoResponse for QRResponse {
 }
 
 fn generate(bytes: &[u8], gen: &Generator) -> Result<QRResponse, StatusCode> {
-    let image = gen
-        .generate(&bytes)
-        .or_else(|_| Err(StatusCode::BAD_REQUEST))?;
+    let image = gen.generate(bytes).map_err(|_| StatusCode::BAD_REQUEST)?;
 
     match gen.format {
         Format::Svg => {
@@ -342,6 +332,6 @@ async fn get_handler(
             .unwrap_or_else(|| path.to_string());
 
         let bytes = input.as_bytes();
-        generate(&bytes, &gen)
+        generate(bytes, &gen)
     }
 }
