@@ -28,12 +28,28 @@ fn generator_from_headers(headers: &Headers) -> Result<Generator> {
         gen.format = Format::from(&val);
     }
 
+    if let Some(val) = get_first_header_value(headers, "x-qr-width") {
+        gen.width = val.parse().map(Some).map_err(|_| "Bad Request")?;
+    }
+
+    if let Some(val) = get_first_header_value(headers, "x-qr-height") {
+        gen.height = val.parse().map(Some).map_err(|_| "Bad Request")?;
+    }
+
     if let Some(val) = get_first_header_value(headers, "x-qr-min-width") {
         gen.min_width = val.parse().map(Some).map_err(|_| "Bad Request")?;
     }
 
     if let Some(val) = get_first_header_value(headers, "x-qr-min-height") {
         gen.min_height = val.parse().map(Some).map_err(|_| "Bad Request")?;
+    }
+
+    if let Some(val) = get_first_header_value(headers, "x-qr-max-width") {
+        gen.max_width = val.parse().map(Some).map_err(|_| "Bad Request")?;
+    }
+
+    if let Some(val) = get_first_header_value(headers, "x-qr-max-height") {
+        gen.max_height = val.parse().map(Some).map_err(|_| "Bad Request")?;
     }
 
     if let Some(val) = get_first_header_value(headers, "x-qr-dark-color") {

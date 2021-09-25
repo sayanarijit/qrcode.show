@@ -73,8 +73,14 @@ impl From<&str> for VersionType {
 pub struct Generator {
     pub format: Format,
 
+    pub width: Option<u32>,
+    pub height: Option<u32>,
+
     pub min_width: Option<u32>,
     pub min_height: Option<u32>,
+
+    pub max_width: Option<u32>,
+    pub max_height: Option<u32>,
 
     pub dark_color: Option<String>,
     pub light_color: Option<String>,
@@ -116,14 +122,31 @@ impl Generator {
 
         let code = code?;
 
+        let min_height = self.height.or(self.min_height).unwrap_or_else(|| {
+            if matches!(self.format, Format::Unicode) {
+                20
+            } else {
+                360
+            }
+        });
+        let min_width = self.width.or(self.min_width).unwrap_or(min_height);
+        let max_height = self
+            .height
+            .or(self.max_height)
+            .unwrap_or_default()
+            .max(min_height);
+        let max_width = self
+            .width
+            .or(self.max_width)
+            .unwrap_or_default()
+            .max(min_width);
+
         let image = match self.format {
             Format::Svg | Format::Html => {
                 let mut bytes = code
                     .render()
-                    .min_dimensions(
-                        self.min_width.unwrap_or(240),
-                        self.min_height.unwrap_or(240),
-                    )
+                    .min_dimensions(min_width, min_height)
+                    .max_dimensions(max_width, max_height)
                     .dark_color(svg::Color(
                         self.dark_color.as_deref().unwrap_or("#000"),
                     ))
@@ -140,10 +163,8 @@ impl Generator {
             Format::Png => {
                 let image = code
                     .render::<Luma<u8>>()
-                    .min_dimensions(
-                        self.min_width.unwrap_or(240),
-                        self.min_height.unwrap_or(240),
-                    )
+                    .min_dimensions(min_width, min_height)
+                    .max_dimensions(max_width, max_height)
                     .quiet_zone(self.quiet_zone.unwrap_or(true))
                     .build();
                 let bytes = image.as_bytes();
@@ -158,10 +179,8 @@ impl Generator {
             Format::Jpeg => {
                 let image = code
                     .render::<Luma<u8>>()
-                    .min_dimensions(
-                        self.min_width.unwrap_or(240),
-                        self.min_height.unwrap_or(240),
-                    )
+                    .min_dimensions(min_width, min_height)
+                    .max_dimensions(max_width, max_height)
                     .quiet_zone(self.quiet_zone.unwrap_or(true))
                     .build();
                 let bytes = image.as_bytes();
@@ -187,10 +206,8 @@ impl Generator {
             Format::Unicode => {
                 let mut bytes = code
                     .render::<unicode::Dense1x2>()
-                    .min_dimensions(
-                        self.min_width.unwrap_or(20),
-                        self.min_height.unwrap_or(20),
-                    )
+                    .min_dimensions(min_width, min_height)
+                    .max_dimensions(max_width, max_height)
                     .dark_color(unicode::Dense1x2::Dark)
                     .light_color(unicode::Dense1x2::Light)
                     .quiet_zone(self.quiet_zone.unwrap_or(true))

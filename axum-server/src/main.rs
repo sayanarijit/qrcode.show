@@ -78,6 +78,20 @@ where
             gen.format = Format::from(&val);
         }
 
+        if let Some(val) =
+            get_first_header_value(req, HeaderName::from_static("x-qr-width"))
+        {
+            gen.width =
+                val.parse().map(Some).map_err(|_| StatusCode::BAD_REQUEST)?;
+        }
+
+        if let Some(val) =
+            get_first_header_value(req, HeaderName::from_static("x-qr-height"))
+        {
+            gen.height =
+                val.parse().map(Some).map_err(|_| StatusCode::BAD_REQUEST)?;
+        }
+
         if let Some(val) = get_first_header_value(
             req,
             HeaderName::from_static("x-qr-min-width"),
@@ -91,6 +105,22 @@ where
             HeaderName::from_static("x-qr-min-height"),
         ) {
             gen.min_height =
+                val.parse().map(Some).map_err(|_| StatusCode::BAD_REQUEST)?;
+        }
+
+        if let Some(val) = get_first_header_value(
+            req,
+            HeaderName::from_static("x-qr-max-width"),
+        ) {
+            gen.max_width =
+                val.parse().map(Some).map_err(|_| StatusCode::BAD_REQUEST)?;
+        }
+
+        if let Some(val) = get_first_header_value(
+            req,
+            HeaderName::from_static("x-qr-max-height"),
+        ) {
+            gen.max_height =
                 val.parse().map(Some).map_err(|_| StatusCode::BAD_REQUEST)?;
         }
 
