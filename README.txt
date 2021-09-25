@@ -34,9 +34,17 @@ PARAMETERS:
                                     image/jpeg
                                 Default: application/octet-stream
 
+    X-QR-Width                  Specify the default width
+
+    X-QR-Height                 Specify the default height
+
     X-QR-Min-Width              Specify the minimum width
 
     X-QR-Min-Height             Specify the minimun height
+
+    X-QR-Max-Width              Specify the maximum width
+
+    X-QR-Max-Height             Specify the maximum height
 
     X-QR-Dark-Color             Specify the dark color (hex)
                                 Format: rrggbb
