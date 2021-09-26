@@ -129,7 +129,14 @@ impl Generator {
                 360
             }
         });
-        let min_width = self.width.or(self.min_width).unwrap_or(min_height);
+        let min_width = self.width.or(self.min_width).unwrap_or_else(|| {
+            if matches!(self.format, Format::Unicode) {
+                20
+            } else {
+                360
+            }
+        });
+
         let max_height = self
             .height
             .or(self.max_height)
