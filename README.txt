@@ -40,7 +40,7 @@ PARAMETERS:
 
     X-QR-Min-Width              Specify the minimum width
 
-    X-QR-Min-Height             Specify the minimun height
+    X-QR-Min-Height             Specify the minimum height
 
     X-QR-Max-Width              Specify the maximum width
 
