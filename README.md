@@ -37,21 +37,61 @@ echo https://example.com | curl qrcode.show -d @-
 
 ### PARAMETERS:
 
-|        Accept       	|                                                                                                                                                                                          Specify the output type                                                                                                                                                                                         	|
-|:-------------------:	|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:	|
-|                     	| Options:<br>                                    application/octet-stream<br>                                    text/plain<br>                                    text/html<br>                                    image/svg+xml<br>                                    image/png<br>                                    image/jpeg<br>                                Default: application/octet-stream 	|
-|      X-QR-Width     	|                                                                                                                                                                                         Specify the default width                                                                                                                                                                                        	|
-|     X-QR-Height     	|                                                                                                                                                                                        Specify the default height                                                                                                                                                                                        	|
-|    X-QR-Min-Width   	|                                                                                                                                                                                         Specify the minimum width                                                                                                                                                                                        	|
-| X-QR-Min-Height     	|                                                                                                                                                                                        Specify the minimum height                                                                                                                                                                                        	|
-| X-QR-Max-Width      	|                                                                                                                                                                                         Specify the maximum width                                                                                                                                                                                        	|
-| X-QR-Max-Height     	|                                                                                                                                                                                        Specify the maximum height                                                                                                                                                                                        	|
-| X-QR-Dark-Color     	|                                                                                                                                                                              Specify the dark color (hex)<br>Format: rrggbb                                                                                                                                                                              	|
-| X-QR-Light-Color    	|                                                                                                                                                                              Specify the light color (hex)<br>Format: rrggbb                                                                                                                                                                             	|
-| X-QR-Version-Type   	|                                                                                                        Specify the QR version type<br>                                Options:<br>                                    normal<br>                                    micro<br>Default: auto detect                                                                                                        	|
-| X-QR-Version-Number 	| Specify the QR version number<br>                                Options:<br>                                    1..40 for normal<br>                                    1..4 for micro<br>                                Default: auto detect                                                                                                                                                          	|
-|    X-QR-EC-Level    	|                                                      Specify the error checking level<br>                                Options:<br>                                    L<br>                                    M<br>                                    Q<br>                                    H<br>                                Default: L                                                      	|
-|   X-QR-Quiet-Zone   	|                                                                                       Specify whether the quiet zone is added<br>                                Options:<br>                                    true<br>                                    false<br>                                Default: true                                                                                      	|
+```
+    Accept                      Specify the output type
+                                Options:
+                                    application/octet-stream
+                                    text/plain
+                                    text/html
+                                    image/svg+xml
+                                    image/png
+                                    image/jpeg
+                                Default: application/octet-stream
+
+    X-QR-Width                  Specify the default width
+
+    X-QR-Height                 Specify the default height
+
+    X-QR-Min-Width              Specify the minimum width
+
+    X-QR-Min-Height             Specify the minimun height
+
+    X-QR-Max-Width              Specify the maximum width
+
+    X-QR-Max-Height             Specify the maximum height
+
+    X-QR-Dark-Color             Specify the dark color (hex)
+                                Format: rrggbb
+
+    X-QR-Light-Color            Specify the light color (hex)
+                                Format: rrggbb
+
+    X-QR-Version-Type           Specify the QR version type
+                                Options:
+                                    normal
+                                    micro
+                                Default: auto detect
+
+    X-QR-Version-Number         Specify the QR version number
+                                Options:
+                                    1..40 for normal
+                                    1..4 for micro
+                                Default: auto detect
+
+    X-QR-EC-Level               Specify the error checking level
+                                Options:
+                                    L
+                                    M
+                                    Q
+                                    H
+                                Default: L
+
+    X-QR-Quiet-Zone             Specify whether the quiet zone is added
+                                Options:
+                                    true
+                                    false
+                                Default: true
+```
 
 ### PARAMETER EXAMPLES:
 
