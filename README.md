@@ -1,3 +1,4 @@
+<img src = "./logo.png" align = "center"/>
 <h1 align = "center">QRcode.show </h1>
 
 <h2 align = "center">Generate QR code easily for free - QR Code Generation as a Service.</h2>
