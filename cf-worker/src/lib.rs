@@ -155,13 +155,11 @@ pub async fn main(mut req: Request, _env: Env) -> Result<Response> {
     // Add as many routes as your Worker needs! Each route will get a `Request` for handling HTTP
     // functionality and a `RouteContext` which you can use to  and get route parameters and
     // Environment bindings like KV Stores, Durable Objects, Secrets, and Variables.
-    match req.method() {
+    let resp = match req.method() {
         Method::Options => {
             let headers = Headers::new();
 
-            Response::empty()
-                .map(|r| r.with_headers(headers))
-                .and_then(cors)
+            Response::empty().map(|r| r.with_headers(headers))
         }
 
         Method::Post => {
@@ -209,5 +207,7 @@ pub async fn main(mut req: Request, _env: Env) -> Result<Response> {
             }
         }
         _ => Response::error("Method Not Allowed", 405),
-    }
+    };
+
+    resp.and_then(cors)
 }

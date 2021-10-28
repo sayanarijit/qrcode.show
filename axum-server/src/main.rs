@@ -211,11 +211,8 @@ impl IntoResponse for QRResponse {
     type BodyError = Infallible;
 
     fn into_response(self) -> Response<Self::Body> {
-        match self {
-            Self::Cors => {
-                let res = Response::new("".into());
-                cors(res)
-            }
+        let resp = match self {
+            Self::Cors => Response::new("".into()),
 
             Self::Plain(text) => {
                 let mut res = Response::new(text.into());
@@ -224,7 +221,7 @@ impl IntoResponse for QRResponse {
                     HeaderValue::from_static("text/plain"),
                 );
 
-                cors(res)
+                res
             }
 
             Self::Svg(svg) => {
@@ -234,7 +231,7 @@ impl IntoResponse for QRResponse {
                     HeaderValue::from_static("image/svg+xml"),
                 );
 
-                cors(res)
+                res
             }
 
             Self::Html(html) => {
@@ -244,7 +241,7 @@ impl IntoResponse for QRResponse {
                     HeaderValue::from_static("text/html"),
                 );
 
-                cors(res)
+                res
             }
 
             Self::Unicode(data) => {
@@ -256,7 +253,7 @@ impl IntoResponse for QRResponse {
                     ),
                 );
 
-                cors(res)
+                res
             }
 
             Self::Png(png) => {
@@ -266,7 +263,7 @@ impl IntoResponse for QRResponse {
                     HeaderValue::from_static("image/png"),
                 );
 
-                cors(res)
+                res
             }
 
             Self::Jpeg(jpeg) => {
@@ -276,9 +273,10 @@ impl IntoResponse for QRResponse {
                     HeaderValue::from_static("image/jpeg"),
                 );
 
-                cors(res)
+                res
             }
-        }
+        };
+        cors(resp)
     }
 }
 
