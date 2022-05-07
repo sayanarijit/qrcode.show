@@ -125,8 +125,7 @@ TODO:
 
 SPONSORS:
 
-    1. Swordscode - https://swordscode.com - $5
-    2. Nolan Rumble - https://nolanrumble.com - $5
+    1. Nolan Rumble - https://nolanrumble.com - $5
 
     Top 5 sponsors get mentioned here (updated monthly)
     Visit https://opencollective.com/qrcodeshow
