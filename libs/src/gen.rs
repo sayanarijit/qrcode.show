@@ -1,7 +1,9 @@
+use csscolorparser::Color;
 use image::codecs::jpeg::JpegEncoder;
 use image::codecs::png::PngEncoder;
 use image::ColorType;
-use image::Luma;
+use image::EncodableLayout;
+use image::Rgba;
 use qrcode::render::svg;
 use qrcode::render::unicode;
 use qrcode::types::QrError;
@@ -9,8 +11,6 @@ use qrcode::EcLevel;
 use qrcode::QrCode;
 use qrcode::QrResult;
 use qrcode::Version;
-
-use image::EncodableLayout;
 
 #[derive(Debug, Clone, Copy)]
 pub enum Format {
@@ -142,6 +142,7 @@ impl Generator {
             .or(self.max_height)
             .unwrap_or_default()
             .max(min_height);
+
         let max_width = self
             .width
             .or(self.max_width)
@@ -168,33 +169,82 @@ impl Generator {
             }
 
             Format::Png => {
+                let (dr, dg, db, da) = self
+                    .dark_color
+                    .as_deref()
+                    .unwrap_or("#000")
+                    .parse::<Color>()
+                    .unwrap_or(Color::from_rgba8(0, 0, 0, 0))
+                    .to_linear_rgba_u8();
+
+                let (lr, lg, lb, la) = self
+                    .light_color
+                    .as_deref()
+                    .unwrap_or("#fff")
+                    .parse::<Color>()
+                    .unwrap_or(Color::from_rgba8(255, 255, 255, 0))
+                    .to_linear_rgba_u8();
+
                 let image = code
-                    .render::<Luma<u8>>()
+                    .render::<Rgba<u8>>()
+                    .dark_color(Rgba([dr, dg, db, da]))
+                    .light_color(Rgba([lr, lg, lb, la]))
                     .min_dimensions(min_width, min_height)
                     .max_dimensions(max_width, max_height)
                     .quiet_zone(self.quiet_zone.unwrap_or(true))
                     .build();
+
                 let bytes = image.as_bytes();
                 let mut result: Vec<u8> = Default::default();
                 let encoder = PngEncoder::new(&mut result);
                 encoder
-                    .encode(bytes, image.width(), image.height(), ColorType::L8)
+                    .encode(
+                        bytes,
+                        image.width(),
+                        image.height(),
+                        ColorType::Rgba8,
+                    )
                     .map_err(|_| QrError::UnsupportedCharacterSet)?;
+                println!("aaa");
                 result
             }
 
             Format::Jpeg => {
+                let (dr, dg, db, da) = self
+                    .dark_color
+                    .as_deref()
+                    .unwrap_or("#000")
+                    .parse::<Color>()
+                    .unwrap_or(Color::from_rgba8(0, 0, 0, 0))
+                    .to_linear_rgba_u8();
+
+                let (lr, lg, lb, la) = self
+                    .light_color
+                    .as_deref()
+                    .unwrap_or("#fff")
+                    .parse::<Color>()
+                    .unwrap_or(Color::from_rgba8(255, 255, 255, 0))
+                    .to_linear_rgba_u8();
+
                 let image = code
-                    .render::<Luma<u8>>()
+                    .render::<Rgba<u8>>()
+                    .dark_color(Rgba([dr, dg, db, da]))
+                    .light_color(Rgba([lr, lg, lb, la]))
                     .min_dimensions(min_width, min_height)
                     .max_dimensions(max_width, max_height)
                     .quiet_zone(self.quiet_zone.unwrap_or(true))
                     .build();
+
                 let bytes = image.as_bytes();
                 let mut result: Vec<u8> = Default::default();
                 let mut encoder = JpegEncoder::new(&mut result);
                 encoder
-                    .encode(bytes, image.width(), image.height(), ColorType::L8)
+                    .encode(
+                        bytes,
+                        image.width(),
+                        image.height(),
+                        ColorType::Rgba8,
+                    )
                     .map_err(|_| QrError::UnsupportedCharacterSet)?;
                 result
             }

@@ -8,3 +8,4 @@ publish = false
 qrcode = { version = "0.12.0", default-features = false, features = ["svg", "image"] }
 lazy_static = "1.4.0"
 image = "0.23.14"
+csscolorparser = "0.6.1"

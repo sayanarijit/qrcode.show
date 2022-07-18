@@ -2,7 +2,6 @@
 
 <h2 align = "center">Generate QR code easily for free - QR Code Generation as a Service.</h2>
 
-
 <br>
 
 ### INPUT:
@@ -10,12 +9,15 @@
 ```bash
 curl qrcode.show/INPUT
 ```
+
 ```bash
 curl qrcode.show -d INPUT
 ```
+
 ```bash
 curl qrcode.show -d @/PATH/TO/INPUT
 ```
+
 ```bash
 echo INPUT | curl qrcode.show -d @-
 ```
@@ -25,12 +27,15 @@ echo INPUT | curl qrcode.show -d @-
 ```bash
 curl qrcode.show/https://example.com
 ```
-```bash 
+
+```bash
 curl qrcode.show -d https://example.com
 ```
+
 ```bash
 curl qrcode.show -d @/path/to/input.txt
 ```
+
 ```bash
 echo https://example.com | curl qrcode.show -d @-
 ```
@@ -130,44 +135,43 @@ qrserve () {
 ```
 
 ### PROGRAMMING LANGUANGE EXAMPLES
+
 - [Node.js](./examples/nodejs)
 
 ### 🚀 FEATURES :
-    
-* No data collection or retention
-* Fast and simple API that works on both web and terminal
-* Supports GET and POST requests
-* Supports `Accept` header to control the output format
+
+- No data collection or retention
+- Fast and simple API that works on both web and terminal
+- Supports GET and POST requests
+- Supports `Accept` header to control the output format
 
 ### 📝 TODO:
-    
-* Support more parameters
-* Get a logo
-* Support dynamic QR codes
-* Generate premium/branded QR codes
+
+- Support more parameters
+- Get a logo
+- Support dynamic QR codes
+- Generate premium/branded QR codes
 
 ### 💖 SPONSORS:
 
-* Nolan Rumble - https://nolanrumble.com - $5
+- Nolan Rumble - https://nolanrumble.com - $5
 
 > Top 5 sponsors get mentioned here (updated monthly) Visit https://opencollective.com/qrcodeshow
 
 ### 📋 CREDITS:
 
-* Main Library                https://github.com/kennytm/qrcode-rust
-* Cloudflare Worker           https://github.com/cloudflare/workers-rs
-* Alternate Web Server        https://github.com/tokio-rs/axum
+- Main Library https://github.com/kennytm/qrcode-rust
+- Cloudflare Worker https://github.com/cloudflare/workers-rs
+- Alternate Web Server https://github.com/tokio-rs/axum
 
 > Only the direct dependencies for the main business logic are listed here. Please contact the project maintainer if you are missing from the list.
 
-
 ### 🔗 RELATED LINKS:
 
-* Alternate Domain            https://qrqr.show
+- Alternate Domain https://qrqr.show
 
-* Project Repository          https://github.com/sayanarijit/qrcode.show
-* Project Maintainer          https://arijitbasu.in
-
+- Project Repository https://github.com/sayanarijit/qrcode.show
+- Project Maintainer https://arijitbasu.in
 
 ### 📓 COPYRIGHT:
 
