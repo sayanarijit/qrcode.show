@@ -141,8 +141,6 @@ CREDITS:
 
 RELATED LINKS:
 
-    Alternate Domain            https://qrqr.show
-
     Project Repository          https://github.com/sayanarijit/qrcode.show
     Project Maintainer          https://arijitbasu.in
 
