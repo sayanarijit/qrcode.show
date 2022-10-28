@@ -265,8 +265,8 @@ impl Generator {
                     .render::<unicode::Dense1x2>()
                     .min_dimensions(min_width, min_height)
                     .max_dimensions(max_width, max_height)
-                    .dark_color(unicode::Dense1x2::Dark)
-                    .light_color(unicode::Dense1x2::Light)
+                    .dark_color(unicode::Dense1x2::Light)
+                    .light_color(unicode::Dense1x2::Dark)
                     .quiet_zone(self.quiet_zone.unwrap_or(true))
                     .build()
                     .into_bytes();
